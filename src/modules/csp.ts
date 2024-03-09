@@ -126,5 +126,5 @@ export function parse(options?: CSPOptions): string {
             parts.push(`style-src-elem ${parseValue(sources.styleElement)}`);
     }
 
-    return parts.join(';');
+    return parts.join('; ');
 }
