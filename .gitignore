@@ -1,0 +1,7 @@
+# Packages and locks
+node_modules
+bun.lockb
+
+# Output files
+lib
+types

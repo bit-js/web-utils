@@ -1,0 +1,25 @@
+{
+  "name": "@bit-js/web-utils",
+  "version": "1.0.0",
+  "main": "./lib/index.js",
+  "type": "module",
+  "devDependencies": {
+    "@stylistic/eslint-plugin": "latest",
+    "@types/bun": "latest",
+    "@typescript-eslint/eslint-plugin": "latest",
+    "@typescript-eslint/parser": "^7.1.1",
+    "eslint": "^8.57.0",
+    "eslint-plugin-import": "latest",
+    "mitata": "latest",
+    "typescript": "latest"
+  },
+  "dependencies": {},
+  "exports": {
+    ".": "./lib/index.js",
+    "./*": "./lib/*.js"
+  },
+  "scripts": {
+    "build-test": "bun build.ts && bun test",
+    "lint": "bun x eslint ./src"
+  }
+}
