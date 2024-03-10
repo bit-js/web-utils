@@ -9,17 +9,18 @@ export interface ParserOptions {
  * Parse a cookie string
  */
 export function parse(cookie: string): Record<string, string> {
-    const pairs = cookie.split(';');
+    const pairs = cookie.trim().split(';');
     const result: Record<string, string> = {};
 
     for (let i = 0, { length } = pairs; i < length; ++i) {
         const pair = pairs[i];
         const eqIdx = pair.indexOf('=');
 
-        if (eqIdx === -1)
-            result[pair] = '';
-        else
-            result[pair.substring(0, eqIdx)] = pair.substring(eqIdx + 1);
+        if (eqIdx === -1) {
+            // Skip ; at the end
+            if (pair.length !== 0) result[pair.trim()] = '';
+        } else
+            result[pair.substring(0, eqIdx).trim()] = pair.substring(eqIdx + 1).trim();
     }
 
     return result;
@@ -28,8 +29,8 @@ export function parse(cookie: string): Record<string, string> {
 /**
  * Create a cookie parser
  */
-export function parser(options?: ParserOptions): typeof parse {
-    if (typeof options?.decode === 'undefined')
+export function parser(options: ParserOptions): typeof parse {
+    if (typeof options.decode === 'undefined')
         return parse;
 
     const { decode } = options;
@@ -37,17 +38,18 @@ export function parser(options?: ParserOptions): typeof parse {
 
     // Cookie with value decode
     return (cookie) => {
-        const pairs = cookie.split(';');
+        const pairs = cookie.trim().split(';');
         const result: Record<string, string> = {};
 
         for (let i = 0, { length } = pairs; i < length; ++i) {
             const pair = pairs[i];
             const eqIdx = pair.indexOf('=');
 
-            if (eqIdx === -1)
-                result[pair] = defaultValue;
-            else
-                result[pair.substring(0, eqIdx)] = decode(pair.substring(eqIdx + 1));
+            if (eqIdx === -1) {
+                // Skip ; at the end
+                if (pair.length !== 0) result[pair.trim()] = defaultValue;
+            } else
+                result[pair.substring(0, eqIdx).trim()] = decode(pair.substring(eqIdx + 1).trim());
         }
 
         return result;
@@ -87,23 +89,23 @@ function serializeOptions(options: SerializerOptions): string {
     const optionParts: string[] = [];
 
     if (typeof options.domain === 'string')
-        optionParts.push(`Domain=${options.domain}`);
+        optionParts.push(`Domain=${options.domain};`);
     if (options.expires instanceof Date)
-        optionParts.push(`Expires=${options.expires.toUTCString()}`);
+        optionParts.push(`Expires=${options.expires.toUTCString()};`);
     if (options.httpOnly === true)
-        optionParts.push('HttpOnly');
+        optionParts.push('HttpOnly;');
     if (typeof options.maxAge === 'number')
-        optionParts.push(`Max-Age=${options.maxAge}`);
+        optionParts.push(`Max-Age=${options.maxAge};`);
     if (options.partitioned === true)
-        optionParts.push('Partitioned');
+        optionParts.push('Partitioned;');
     if (typeof options.path === 'string')
-        optionParts.push(`Path=${options.path}`);
+        optionParts.push(`Path=${options.path};`);
     if (typeof options.sameSite === 'string')
-        optionParts.push(`SameSite=${sameSiteMap[options.sameSite]}`);
+        optionParts.push(`SameSite=${sameSiteMap[options.sameSite]};`);
     if (options.secure === true)
-        optionParts.push('Secure');
+        optionParts.push('Secure;');
 
-    return optionParts.join(';');
+    return optionParts.join('');
 }
 
 /**
@@ -125,11 +127,9 @@ export function serialize(cookie: Record<string, string | number | true>): strin
 /**
  * Create a cookie serializer
  */
-export function serializer(options?: SerializerOptions): typeof serialize {
-    if (typeof options === 'undefined') return serialize;
-
+export function serializer(options: SerializerOptions): typeof serialize {
     const { encode } = options;
-    return Function('f', `return (c)=>{const p=[${JSON.stringify(serializeOptions(options))}];for(const k in c){const v=c[k];if(v===true)p.push(k);else p.push(\`\${k}=\${${typeof encode === 'function' ? 'f(v.toString())' : 'v.toString()'}}\`)}return p.join(';');}`)(encode);
+    return Function('f', `return (c)=>{const p=[${JSON.stringify(serializeOptions(options))}];for(const k in c){const v=c[k];if(v===true)p.push(k);else p.push(\`\${k}=\${${typeof encode === 'function' ? 'f(v.toString())' : 'v.toString()'}};\`)}return p.join('');}`)(encode);
 }
 
 // Cookie prototypes
@@ -168,7 +168,6 @@ function createLiteral(resultLiteral: string[], setLiteral: string[]): string {
         return JSON.stringify(resultLiteral[0]);
 
     for (let i = 0, { length } = setLiteral; i < length; ++i) resultLiteral.push(`\${${setLiteral[i]}}`);
-
     return `\`${resultLiteral.join('')}\``;
 }
 
@@ -177,23 +176,26 @@ function createLiteral(resultLiteral: string[], setLiteral: string[]): string {
  */
 export function define<T extends CookieProto>(proto: T, options?: SerializerOptions): CookieClass<T> {
     const resultLiteral = [];
-    if (typeof options !== 'undefined')
-        resultLiteral.push(serializeOptions(options));
+    const noOptions = typeof options === 'undefined';
 
-    const props = [];
+    if (!noOptions) resultLiteral.push(serializeOptions(options));
+
     const setLiteral = [];
+    const props = [];
 
     for (const key in proto) {
         props.push(key);
         const type = proto[key];
 
-        // Type: bool
+        // bool
         if (type.length === 4)
-            setLiteral.push(`this.${key}===true?';${key}':''`);
-        else if (type === 'string')
-            setLiteral.push(`typeof this.${key}==='string'?\`;${key}=\${this.${key}}\`:''`);
+            setLiteral.push(`this.${key}===true?'${key};':''`);
+        // string
+        else if (type.charCodeAt(0) === 115)
+            setLiteral.push(`typeof this.${key}==='string'?\`${key}=\${this.${key}};\`:''`);
+        // number
         else
-            setLiteral.push(`typeof this.${key}==='number'?\`;${key}=\${this.${key}.toString()}\`:''`);
+            setLiteral.push(`typeof this.${key}==='number'?\`${key}=\${this.${key}.toString()};\`:''`);
     }
 
     return Function(`'use strict';return class A{${props.join(';')};get(){return ${createLiteral(resultLiteral, setLiteral)}}}`)();
