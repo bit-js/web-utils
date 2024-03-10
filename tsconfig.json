@@ -30,7 +30,7 @@
     "noPropertyAccessFromIndexSignature": false,
     // Output declarations
     "declaration": true,
-    "declarationDir": "types",
+    "declarationDir": "lib",
     "emitDeclarationOnly": true,
     "stripInternal": true
   },

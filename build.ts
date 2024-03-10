@@ -3,6 +3,10 @@ import { existsSync, rmSync } from 'fs';
 import pkg from './package.json';
 import { $ } from 'bun';
 
+// Generating types
+const dir = './lib';
+if (existsSync(dir)) rmSync(dir, { recursive: true });
+
 // Build source files
 Bun.build({
     format: 'esm',
@@ -15,9 +19,5 @@ Bun.build({
     },
     external: Object.keys(pkg.dependencies)
 });
-
-// Generating types
-const dir = './types';
-if (existsSync(dir)) rmSync(dir, { recursive: true });
 
 await $`bun x tsc`;
