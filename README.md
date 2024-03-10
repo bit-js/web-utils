@@ -2,7 +2,7 @@
 A fast web utility library.
 
 ## CSP
-A `Content-Security-Policy` header parser.
+`Content-Security-Policy` header parser.
 ```ts
 import { csp } from '@bit-js/web-utils';
 
@@ -15,7 +15,7 @@ csp.parse(); // "default-src 'self'"
 
 Available options are:
 ```ts
-export interface CSPOptions {
+export interface Options {
     baseURI?: string | string[];
     reportTo?: string;
 
@@ -58,3 +58,44 @@ Special source values include:
 - `csp.strictDynamic`: `'strict-dynamic'`
 - `csp.reportSample`: `'report-sample'`
 - `csp.inlineSpeculationRules`: `'inline-speculation-rules'`
+
+## Cache
+
+### Cache control
+`Cache-Control` header parser.
+```ts
+import { cache } from '@bit-js/web-utils';
+
+// Parse options to header value
+cache.control(options);
+
+// No options
+cache.control(); // "public,max-age=604800"
+```
+
+Available options are:
+```ts
+export interface ControlOptions {
+    maxAge?: number;
+    sMaxAge?: number;
+
+    noCache?: boolean;
+    noStore?: boolean;
+    noTransform?: boolean;
+
+    mustRevalidate?: boolean;
+    proxyRevalidate?: boolean;
+
+    mustUnderstand?: boolean;
+
+    staleWhileRevalidate?: boolean;
+    staleIfError?: boolean;
+
+    private?: boolean;
+    public?: boolean;
+    immutable?: boolean;
+
+    minFresh?: number;
+    onlyIfCached?: boolean;
+}
+```

@@ -29,7 +29,7 @@ export interface SourceDirectives {
     styleElement?: SourceValue;
 }
 
-export interface CSPOptions {
+export interface Options {
     baseURI?: SourceValue;
     reportTo?: string;
 
@@ -69,7 +69,7 @@ export function parseValue(value: SourceValue): string {
 /**
  * Parse CSP options to `Content-Security-Policy` header values
  */
-export function parse(options?: CSPOptions): string {
+export function parse(options?: Options): string {
     if (typeof options === 'undefined') return "default-src 'self'";
 
     // Parts of the header
