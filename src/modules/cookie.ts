@@ -34,7 +34,6 @@ export function parser(options: ParserOptions): typeof parse {
         return parse;
 
     const { decode } = options;
-    const defaultValue = decode('');
 
     // Cookie with value decode
     return (cookie) => {
@@ -47,7 +46,7 @@ export function parser(options: ParserOptions): typeof parse {
 
             if (eqIdx === -1) {
                 // Skip ; at the end
-                if (pair.length !== 0) result[pair.trim()] = defaultValue;
+                if (pair.length !== 0) result[pair.trim()] = '';
             } else
                 result[pair.substring(0, eqIdx).trim()] = decode(pair.substring(eqIdx + 1).trim());
         }
