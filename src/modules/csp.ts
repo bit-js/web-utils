@@ -42,13 +42,13 @@ export interface CSPOptions {
     sources?: SourceDirectives;
 }
 
-// Special source values
-export const self = "'self'";
-export const none = "'none'";
-
 export function hash(value: string, algorithm?: string): string {
     return typeof algorithm === 'string' ? `'${algorithm}-${value}'` : `'nonce-${value}'`;
 }
+
+// Special source values
+export const self = "'self'";
+export const none = "'none'";
 
 export const unsafeEval = "'unsafe-eval'";
 export const wasmUnsafeEval = "'wasm-unsafe-eval'";
