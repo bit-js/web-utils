@@ -257,14 +257,6 @@
                 "trailingUnderscore": "allow"
             },
             {
-                "selector": "classProperty",
-                "format": [
-                    "strictCamelCase"
-                ],
-                "leadingUnderscore": "allow",
-                "trailingUnderscore": "allow"
-            },
-            {
                 "selector": "objectLiteralProperty",
                 "format": [
                     "PascalCase",

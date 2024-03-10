@@ -1,4 +1,4 @@
-export type CSPSandboxValue = boolean |
+export type SandboxValue = boolean |
     `allow-${'downloads' | 'forms' | 'modals' |
     'orientation-lock' | 'pointer-lock' |
     `popups${'' | '-to-escape-sandbox'}` |
@@ -6,38 +6,38 @@ export type CSPSandboxValue = boolean |
     'scripts' | `top-navigation${'' | '-by-user-activation' | '-to-custom-protocols'}`
     }`;
 
-export type CSPSourceValue = string | string[];
+export type SourceValue = string | string[];
 
 export interface SourceDirectives {
-    default?: CSPSourceValue;
+    default?: SourceValue;
 
-    child?: CSPSourceValue;
-    connect?: CSPSourceValue;
-    font?: CSPSourceValue;
-    image?: CSPSourceValue;
-    media?: CSPSourceValue;
-    object?: CSPSourceValue;
-    manifest?: CSPSourceValue;
-    worker?: CSPSourceValue;
+    child?: SourceValue;
+    connect?: SourceValue;
+    font?: SourceValue;
+    image?: SourceValue;
+    media?: SourceValue;
+    object?: SourceValue;
+    manifest?: SourceValue;
+    worker?: SourceValue;
 
-    script?: CSPSourceValue;
-    scriptAttribute?: CSPSourceValue;
-    scriptElement?: CSPSourceValue;
+    script?: SourceValue;
+    scriptAttribute?: SourceValue;
+    scriptElement?: SourceValue;
 
-    style?: CSPSourceValue;
-    styleAttribute?: CSPSourceValue;
-    styleElement?: CSPSourceValue;
+    style?: SourceValue;
+    styleAttribute?: SourceValue;
+    styleElement?: SourceValue;
 }
 
 export interface CSPOptions {
-    baseURI?: CSPSourceValue;
+    baseURI?: SourceValue;
     reportTo?: string;
 
-    sandbox?: CSPSandboxValue;
+    sandbox?: SandboxValue;
     upgradeInsecureRequests?: boolean;
 
-    frameAncestors?: CSPSourceValue;
-    formAction?: CSPSourceValue;
+    frameAncestors?: SourceValue;
+    formAction?: SourceValue;
 
     sources?: SourceDirectives;
 }
@@ -47,7 +47,7 @@ export const self = "'self'";
 export const none = "'none'";
 
 export function hash(value: string, algorithm?: string): string {
-    return typeof algorithm === 'string' ? `${algorithm}-${value}` : `nonce-${value}`;
+    return typeof algorithm === 'string' ? `'${algorithm}-${value}'` : `'nonce-${value}'`;
 }
 
 export const unsafeEval = "'unsafe-eval'";
@@ -62,7 +62,7 @@ export const inlineSpeculationRules = "'inline-speculation-rules'";
 /**
  * Parse a CSP source value to string
  */
-export function parseValue(value: CSPSourceValue): string {
+export function parseValue(value: SourceValue): string {
     return typeof value === 'string' ? value : value.join(' ');
 }
 
