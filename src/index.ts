@@ -1,3 +1,5 @@
 // Content security policy
-import * as csp from './modules/csp';
-export { csp };
+export * as csp from './modules/csp';
+
+// Cache
+export * as cache from './modules/cache.ts';

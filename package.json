@@ -7,9 +7,10 @@
     "@stylistic/eslint-plugin": "latest",
     "@types/bun": "latest",
     "@typescript-eslint/eslint-plugin": "latest",
-    "@typescript-eslint/parser": "^7.1.1",
-    "eslint": "^8.57.0",
+    "@typescript-eslint/parser": "latest",
+    "eslint": "latest",
     "eslint-plugin-import": "latest",
+    "eslint-import-resolver-typescript": "latest",
     "mitata": "latest",
     "typescript": "latest"
   },

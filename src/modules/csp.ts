@@ -67,7 +67,7 @@ export function parseValue(value: SourceValue): string {
 }
 
 /**
- * Parse CSP options to header values
+ * Parse CSP options to `Content-Security-Policy` header values
  */
 export function parse(options?: CSPOptions): string {
     if (typeof options === 'undefined') return "default-src 'self'";
@@ -83,7 +83,7 @@ export function parse(options?: CSPOptions): string {
     if (typeof options.reportTo === 'string')
         parts.push(`report-to ${options.reportTo}`);
 
-    if (typeof options.sandbox !== 'undefined')
+    if (typeof options.sandbox !== 'undefined' && options.sandbox !== false)
         parts.push(options.sandbox === true ? 'sandbox' : `sandbox '${options.sandbox}'`);
 
     if (options.upgradeInsecureRequests === true)
@@ -126,5 +126,5 @@ export function parse(options?: CSPOptions): string {
             parts.push(`style-src-elem ${parseValue(sources.styleElement)}`);
     }
 
-    return parts.join('; ');
+    return parts.join(';');
 }
