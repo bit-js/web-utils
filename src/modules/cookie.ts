@@ -178,7 +178,7 @@ export function define<T extends CookieProto>(proto: T, options?: SerializerOpti
 
         // bool
         if (type.length === 4)
-            setLiteral.push(`this.${key}===true?'${key};':''`);
+            setLiteral.push(`this.${key}===true?'${key}':''`);
         // string
         else if (type.charCodeAt(0) === 115)
             setLiteral.push(`typeof this.${key}==='string'?\`${key}=\${this.${key}}\`:''`);
