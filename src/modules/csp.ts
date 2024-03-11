@@ -90,7 +90,7 @@ export function parse(options?: Options): string {
         parts.push('upgrade-insecure-requests');
 
     const { sources } = options;
-    if (typeof sources === 'object') {
+    if (typeof sources !== 'undefined') {
         if (typeof sources.default !== 'undefined')
             parts.push(`default-src ${parseValue(sources.default)}`);
 

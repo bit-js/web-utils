@@ -9,18 +9,12 @@ export interface ParserOptions {
  * Parse a cookie string
  */
 export function parse(cookie: string): Record<string, string> {
-    const pairs = cookie.trim().split(';');
+    const pairs = cookie.split(';');
     const result: Record<string, string> = {};
 
     for (let i = 0, { length } = pairs; i < length; ++i) {
-        const pair = pairs[i];
-        const eqIdx = pair.indexOf('=');
-
-        if (eqIdx === -1) {
-            // Skip ; at the end
-            if (pair.length !== 0) result[pair.trim()] = '';
-        } else
-            result[pair.substring(0, eqIdx).trim()] = pair.substring(eqIdx + 1).trim();
+        const pair = pairs[i].split('=');
+        result[pair[0].trim()] = pair.length === 1 ? '' : pair[1].trim();
     }
 
     return result;
@@ -34,22 +28,16 @@ export function parser(options: ParserOptions): typeof parse {
         return parse;
 
     const { decode } = options;
-    const defaultValue = decode('');
+    const defaultVal = decode('');
 
     // Cookie with value decode
     return (cookie) => {
-        const pairs = cookie.trim().split(';');
+        const pairs = cookie.split(';');
         const result: Record<string, string> = {};
 
         for (let i = 0, { length } = pairs; i < length; ++i) {
-            const pair = pairs[i];
-            const eqIdx = pair.indexOf('=');
-
-            if (eqIdx === -1) {
-                // Skip ; at the end
-                if (pair.length !== 0) result[pair.trim()] = defaultValue;
-            } else
-                result[pair.substring(0, eqIdx).trim()] = decode(pair.substring(eqIdx + 1).trim());
+            const pair = pairs[i].split('=');
+            result[pair[0].trim()] = pair.length === 1 ? defaultVal : decode(pair[1].trim());
         }
 
         return result;
@@ -89,23 +77,23 @@ function serializeOptions(options: SerializerOptions): string {
     const optionParts: string[] = [];
 
     if (typeof options.domain === 'string')
-        optionParts.push(`Domain=${options.domain};`);
+        optionParts.push(`Domain=${options.domain}`);
     if (options.expires instanceof Date)
-        optionParts.push(`Expires=${options.expires.toUTCString()};`);
+        optionParts.push(`Expires=${options.expires.toUTCString()}`);
     if (options.httpOnly === true)
-        optionParts.push('HttpOnly;');
+        optionParts.push('HttpOnly');
     if (typeof options.maxAge === 'number')
-        optionParts.push(`Max-Age=${options.maxAge};`);
+        optionParts.push(`Max-Age=${options.maxAge}`);
     if (options.partitioned === true)
-        optionParts.push('Partitioned;');
+        optionParts.push('Partitioned');
     if (typeof options.path === 'string')
-        optionParts.push(`Path=${options.path};`);
+        optionParts.push(`Path=${options.path}`);
     if (typeof options.sameSite === 'string')
-        optionParts.push(`SameSite=${sameSiteMap[options.sameSite]};`);
+        optionParts.push(`SameSite=${sameSiteMap[options.sameSite]}`);
     if (options.secure === true)
-        optionParts.push('Secure;');
+        optionParts.push('Secure');
 
-    return optionParts.join('');
+    return optionParts.join(';');
 }
 
 /**
@@ -129,7 +117,7 @@ export function serialize(cookie: Record<string, string | number | true>): strin
  */
 export function serializer(options: SerializerOptions): typeof serialize {
     const { encode } = options;
-    return Function('f', `return (c)=>{const p=[${JSON.stringify(serializeOptions(options))}];for(const k in c){const v=c[k];if(v===true)p.push(k);else p.push(\`\${k}=\${${typeof encode === 'function' ? 'f(v.toString())' : 'v.toString()'}};\`)}return p.join('');}`)(encode);
+    return Function('f', `return (c)=>{const p=[${JSON.stringify(serializeOptions(options))}];for(const k in c){const v=c[k];if(v===true)p.push(k);else p.push(\`\${k}=\${${typeof encode === 'function' ? 'f(v.toString())' : 'v.toString()'}};\`)}return p.join(';');}`)(encode);
 }
 
 // Cookie prototypes
@@ -167,8 +155,9 @@ function createLiteral(resultLiteral: string[], setLiteral: string[]): string {
     if (resultLiteral.length === 1 && setLiteral.length === 0)
         return JSON.stringify(resultLiteral[0]);
 
+    // Wrap each set literal with ${}
     for (let i = 0, { length } = setLiteral; i < length; ++i) resultLiteral.push(`\${${setLiteral[i]}}`);
-    return `\`${resultLiteral.join('')}\``;
+    return `\`${resultLiteral.join(';')}\``;
 }
 
 /**
@@ -192,11 +181,12 @@ export function define<T extends CookieProto>(proto: T, options?: SerializerOpti
             setLiteral.push(`this.${key}===true?'${key};':''`);
         // string
         else if (type.charCodeAt(0) === 115)
-            setLiteral.push(`typeof this.${key}==='string'?\`${key}=\${this.${key}};\`:''`);
+            setLiteral.push(`typeof this.${key}==='string'?\`${key}=\${this.${key}}\`:''`);
         // number
         else
-            setLiteral.push(`typeof this.${key}==='number'?\`${key}=\${this.${key}.toString()};\`:''`);
+            setLiteral.push(`typeof this.${key}==='number'?\`${key}=\${this.${key}.toString()}\`:''`);
     }
 
-    return Function(`'use strict';return class A{${props.join(';')};get(){return ${createLiteral(resultLiteral, setLiteral)}}}`)();
+    props.push(`get(){return ${createLiteral(resultLiteral, setLiteral)}}`);
+    return Function(`'use strict';return class A{${props.join(';')}};`)();
 }
