@@ -73,7 +73,7 @@ export interface SerializerOptions {
 /**
  * @internal Get serialized options
  */
-function serializeOptions(options: SerializerOptions): string {
+function serializeOptions(options: SerializerOptions): string[] {
     const optionParts: string[] = [];
 
     if (typeof options.domain === 'string')
@@ -93,7 +93,7 @@ function serializeOptions(options: SerializerOptions): string {
     if (options.secure === true)
         optionParts.push('Secure');
 
-    return optionParts.join(';');
+    return optionParts;
 }
 
 /**
@@ -117,7 +117,7 @@ export function serialize(cookie: Record<string, string | number | true>): strin
  */
 export function serializer(options: SerializerOptions): typeof serialize {
     const { encode } = options;
-    return Function('f', `return (c)=>{const p=[${JSON.stringify(serializeOptions(options))}];for(const k in c){const v=c[k];if(v===true)p.push(k);else p.push(\`\${k}=\${${typeof encode === 'function' ? 'f(v.toString())' : 'v.toString()'}};\`)}return p.join(';');}`)(encode);
+    return Function('f', `return (c)=>{const p=[${JSON.stringify(serializeOptions(options).join())}];for(const k in c){const v=c[k];if(v===true)p.push(k);else p.push(\`\${k}=\${${typeof encode === 'function' ? 'f(v.toString())' : 'v.toString()'}};\`)}return p.join(';');}`)(encode);
 }
 
 // Cookie prototypes
@@ -157,34 +157,54 @@ function createLiteral(resultLiteral: string[], setLiteral: string[]): string {
 
     // Wrap each set literal with ${}
     for (let i = 0, { length } = setLiteral; i < length; ++i) resultLiteral.push(`\${${setLiteral[i]}}`);
-    return `\`${resultLiteral.join(';')}\``;
+    return `\`${resultLiteral.join('')}\``;
 }
 
 /**
  * Define a class to create and serialize cookie
  */
 export function define<T extends CookieProto>(proto: T, options?: SerializerOptions): CookieClass<T> {
-    const resultLiteral = [];
+    const resultLiteral: string[] = [];
     const noOptions = typeof options === 'undefined';
 
-    if (!noOptions) resultLiteral.push(serializeOptions(options));
+    if (!noOptions) resultLiteral.push(serializeOptions(options).join(';'));
 
     const setLiteral = [];
-    const props = [];
+    const props = Object.keys(proto);
 
-    for (const key in proto) {
-        props.push(key);
+    // Handle first key
+    {
+        const [key] = props;
+        const type = proto[key];
+        if (noOptions) {
+            // bool
+            if (type.length === 4)
+                setLiteral.push(`this.${key}===true?'${key}':''`);
+            // string
+            else if (type.charCodeAt(0) === 115)
+                setLiteral.push(`typeof this.${key}==='string'?\`${key}=\${this.${key}}\`:''`);
+            // number
+            else
+                setLiteral.push(`typeof this.${key}==='number'?\`${key}=\${this.${key}.toString()}\`:''`);
+            // Check like other props
+        } else if (type.length === 4)
+            setLiteral.push(`this.${key}===true?';${key}':''`);
+        else if (type.charCodeAt(0) === 115)
+            setLiteral.push(`typeof this.${key}==='string'?\`;${key}=\${this.${key}}\`:''`);
+        else
+            setLiteral.push(`typeof this.${key}==='number'?\`;${key}=\${this.${key}.toString()}\`:''`);
+    }
+
+    for (let i = 1, { length } = props; i < length; ++i) {
+        const key = props[i];
         const type = proto[key];
 
-        // bool
         if (type.length === 4)
-            setLiteral.push(`this.${key}===true?'${key}':''`);
-        // string
+            setLiteral.push(`this.${key}===true?';${key}':''`);
         else if (type.charCodeAt(0) === 115)
-            setLiteral.push(`typeof this.${key}==='string'?\`${key}=\${this.${key}}\`:''`);
-        // number
+            setLiteral.push(`typeof this.${key}==='string'?\`;${key}=\${this.${key}}\`:''`);
         else
-            setLiteral.push(`typeof this.${key}==='number'?\`${key}=\${this.${key}.toString()}\`:''`);
+            setLiteral.push(`typeof this.${key}==='number'?\`;${key}=\${this.${key}.toString()}\`:''`);
     }
 
     props.push(`get(){return ${createLiteral(resultLiteral, setLiteral)}}`);
