@@ -22,6 +22,7 @@
   },
   "scripts": {
     "build-test": "bun build.ts && bun test",
+    "jitrun": "BUN_JSC_jitPolicyScale=0.0 BUN_JSC_thresholdForOptimizeSoon=0.0 BUN_JSC_thresholdForJITSoon=0.0 bun run",
     "lint": "bun x eslint ./src"
   }
 }
