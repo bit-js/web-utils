@@ -186,3 +186,28 @@ cookie.get(); // 'id=1;name=A;darkMode;'
 
 This method accepts a `SerializerOptions` as the second parameter.
 
+## HTML
+HTML parsing utilities.
+```ts
+import { html } from '@bit-js/byte';
+```
+
+### Escaping
+Escape HTML entities.
+```ts
+html.escape(str);
+```
+
+This uses `Bun.escapeHtml` if you are using Bun.
+
+### Tag
+Use template literals to write HTML.
+```ts
+// `username` is escaped
+html.tag`<p>Hi, ${username}</p>`;
+
+// `username` is not escaped
+html.tag`<p>Hi, !${username}</p>`;
+```
+
+This function only accepts string values to avoid bad practices when writing code (If you know what I mean).
