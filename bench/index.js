@@ -6,7 +6,8 @@ import { id } from '..';
 import { nanoid } from 'nanoid/non-secure';
 
 for (let i = 0; i < 15; ++i) bench('noop', () => { });
-group('Generate 1e7 id of size 32', () => {
+
+group('Generate 1e7 non-secure id of size 32', () => {
     bench('UID', () => {
         for (let i = 0; i < 1e7; ++i) uid(32);
     });
