@@ -10,5 +10,5 @@ export * as cookie from './modules/cookie';
 // HTML utils
 export * as html from './modules/html';
 
-// Others
-export * as utils from './modules/utils';
+// ID
+export * as id from './modules/id';
