@@ -1,21 +1,22 @@
 /**
  * Create a non-secure ID generator that uses `Math.random()`
  */
-export function random(len: number, base: number = 36): () => string {
+export function random(len: number): () => string {
+    if (len < 2) throw new Error(`Cannot create a randomizer with length smaller than 2 (${len})`);
+
     // The hex map for appending
-    const hexSize = base * base;
-    const hexMap = new Array<string>(hexSize);
-    for (let i = 0; i < hexSize; ++i) hexMap[i] = (i + hexSize).toString(base);
+    const hexMap = new Array<string>(1296);
+    // Generated string always have length 2
+    for (let i = 0; i < 1296; ++i) hexMap[i] = (i + 1296).toString(36).substring(1);
 
-    // hex string len
-    const hexLen = hexMap[0].length;
-    if (len < hexLen) throw new Error(`Hex map length (${hexLen}) is larger than requested length (${len})`);
+    const paddingCount = (len >>> 1) - 1;
+    if ((len & 1) === 0)
+        return Function('h', `'use strict';let s='';let j=1;for(let i=0;i<${paddingCount};++i)s+=h[1296*Math.random()>>>0];return ()=>{if(j===1296){s='';j=1;for(let i=0;i<${paddingCount};++i)s+=h[1296*Math.random()>>>0];return s+h[0];};return s+h[j++];}`)(hexMap);
 
-    const paddingMod = len % hexLen;
-    const fillPadding = paddingMod === 0 ? '' : `s+=h1[${hexSize}*Math.random()|0];`;
+    const paddingHex = new Array<string>(1296);
     // eslint-disable-next-line
-    const paddingCount = ((len / hexLen) | 0) - 1;
+    for (let i = 0; i < 1296; ++i) paddingHex[i] = hexMap[i][0];
 
     // eslint-disable-next-line
-    return Function('h', `'use strict';${paddingMod === 0 ? '' : `const h1=new Array(${hexSize});for(let i=0;i<${hexSize};++i)h1[i]=h[i].substring(0,${paddingMod});`}let s='';let j=1;for(let i=0;i<${paddingCount};++i)s+=h[${hexSize}*Math.random()|0];${fillPadding}return ()=>{if(j===${hexSize}){s='';j=1;for(let i=0;i<${paddingCount};++i)s+=h[${hexSize}*Math.random()|0];${fillPadding}return s+h[0];};return s+h[j++];}`)(hexMap);
+    return Function('h', 'h1', `'use strict';let s='';let j=1;for(let i=0;i<${paddingCount};++i)s+=h[1296*Math.random()>>>0];s+=h1[1296*Math.random()|0];return ()=>{if(j===1296){s='';j=1;for(let i=0;i<${paddingCount};++i)s+=h[1296*Math.random()>>>0];s+=h1[1296*Math.random()>>>0];return s+h[0];};return s+h[j++];}`)(hexMap, paddingHex);
 }
