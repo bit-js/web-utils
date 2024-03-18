@@ -1,7 +1,7 @@
 /**
  * Create a non-secure ID generator that uses `Math.random()`
  */
-export function randomizer(len: number, base: number = 36): () => string {
+export function random(len: number, base: number = 36): () => string {
     // The hex map for appending
     const hexSize = base * base;
     const hexMap = new Array<string>(hexSize);

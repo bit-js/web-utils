@@ -199,3 +199,18 @@ html.escape(str);
 ```
 
 This uses `Bun.escapeHtml` if you are using Bun.
+
+## ID
+ID generator utilities.
+```ts
+import { id } from '@bit-js/byte';
+```
+
+### Non-secure
+A fast non-secure ID generator using `Math.random()`.
+```ts
+// Specify string length
+const generate = id.random(32);
+```
+
+This is an optimized version of [`hexoid`](//github.com/lukeed/hexoid).
