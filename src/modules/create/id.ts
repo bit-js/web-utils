@@ -1,7 +1,7 @@
 /**
  * Create a non-secure ID generator factory that uses `Math.random()`
  */
-export function createBase(radix: number, mapItemLength: number): (length: number) => () => string {
+function factory(radix: number, mapItemLength: number): (length: number) => () => string {
     const mapSize = radix ** mapItemLength;
     const randomMap = new Array<string>(mapSize);
     for (let i = 0; i < mapSize; ++i) randomMap[i] = (i + mapSize).toString(radix).substring(1);
@@ -17,7 +17,17 @@ export function createBase(radix: number, mapItemLength: number): (length: numbe
             return Function('h', `'use strict';let s='';let j=1;for(let i=0;i<${paddingCount};++i)s+=h[${mapSize}*Math.random()>>>0];return ()=>{if(j===${mapSize}){s='';j=1;for(let i=0;i<${paddingCount};++i)s+=h[${mapSize}*Math.random()>>>0];return s+h[0];};return s+h[j++];}`)(randomMap);
 
         const padding = new Array<string>(mapSize);
-        for (let i = 0; i < mapSize; ++i) padding[i] = randomMap[i].substring(0, paddingSize);
+        // Slice the first {paddingSize} characters
+        if (paddingSize === 1)
+            // eslint-disable-next-line
+            for (let i = 0; i < mapSize; ++i)
+                // eslint-disable-next-line
+                padding[i] = randomMap[i][0];
+        else
+            // eslint-disable-next-line
+            for (let i = 0; i < mapSize; ++i)
+                // eslint-disable-next-line
+                padding[i] = randomMap[i].substring(0, paddingSize);
 
         // eslint-disable-next-line
         return Function('h', 'h1', `'use strict';let s='';let j=1;for(let i=0;i<${paddingCount};++i)s+=h[${mapSize}*Math.random()>>>0];s+=h1[${mapSize}*Math.random()>>>0];return ()=>{if(j===${mapSize}){s='';j=1;for(let i=0;i<${paddingCount};++i)s+=h[${mapSize}*Math.random()>>>0];s+=h1[${mapSize}*Math.random()>>>0];return s+h[0];};return s+h[j++];}`)(randomMap, padding);
@@ -27,4 +37,4 @@ export function createBase(radix: number, mapItemLength: number): (length: numbe
 /**
  * Create a non-secure ID generator that uses `Math.random()`
  */
-export const random = createBase(16, 2);
+export const id = factory(36, 2);

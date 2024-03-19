@@ -189,7 +189,7 @@ This method accepts a `SerializerOptions` as the second parameter.
 ## HTML
 HTML parsing utilities.
 ```ts
-import { html } from '@bit-js/byte';
+import { html } from '@bit-js/web-utils';
 ```
 
 ### Escaping
@@ -200,17 +200,20 @@ html.escape(str);
 
 This uses `Bun.escapeHtml` if you are using Bun.
 
-## ID
-ID generator utilities.
+## Generators
+Generator utilities.
 ```ts
-import { id } from '@bit-js/byte';
+import { create } from '@bit-js/web-utils';
 ```
 
-### Non-secure
+### Non-secure ID
 A fast non-secure ID generator using `Math.random()`.
 ```ts
 // Specify string length
-const generate = id.random(32);
+const f = create.id(32);
+
+// Generate a random ID of length 32
+f();
 ```
 
-This is an optimized version of [`hexoid`](//github.com/lukeed/hexoid).
+This is an optimized version of [`hexoid`](//github.com/lukeed/hexoid) by [@lukeed](//github.com/lukeed).

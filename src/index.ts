@@ -11,4 +11,4 @@ export * as cookie from './modules/cookie';
 export * as html from './modules/html';
 
 // ID
-export * as id from './modules/id';
+export * as create from './modules/create';
