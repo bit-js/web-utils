@@ -170,29 +170,39 @@ export function define<T extends CookieProto>(proto: T, options?: SerializerOpti
     if (!noOptions) resultLiteral.push(serializeOptions(options).join(';'));
 
     const setLiteral = [];
+    const keyToCache = [];
     const props = Object.keys(proto);
 
     // Handle first key
     {
         const [key] = props;
         const type = proto[key];
+
         if (noOptions) {
             // bool
             if (type.length === 4)
                 setLiteral.push(`this.${key}===true?'${key}':''`);
             // string
-            else if (type.charCodeAt(0) === 115)
-                setLiteral.push(`typeof this.${key}==='string'?\`${key}=\${this.${key}}\`:''`);
-            // number
-            else
-                setLiteral.push(`typeof this.${key}==='number'?\`${key}=\${this.${key}.toString()}\`:''`);
+            else {
+                keyToCache.push(key);
+
+                if (type.charCodeAt(0) === 115)
+                    setLiteral.push(`typeof ${key}==='string'?\`${key}=\${${key}}\`:''`);
+                // number
+                else
+                    setLiteral.push(`typeof ${key}==='number'?\`${key}=\${${key}.toString()}\`:''`);
+            }
             // Check like other props
         } else if (type.length === 4)
             setLiteral.push(`this.${key}===true?';${key}':''`);
-        else if (type.charCodeAt(0) === 115)
-            setLiteral.push(`typeof this.${key}==='string'?\`;${key}=\${this.${key}}\`:''`);
-        else
-            setLiteral.push(`typeof this.${key}==='number'?\`;${key}=\${this.${key}.toString()}\`:''`);
+        else {
+            keyToCache.push(key);
+
+            if (type.charCodeAt(0) === 115)
+                setLiteral.push(`typeof ${key}==='string'?\`;${key}=\${${key}}\`:''`);
+            else
+                setLiteral.push(`typeof ${key}==='number'?\`;${key}=\${${key}.toString()}\`:''`);
+        }
     }
 
     for (let i = 1, { length } = props; i < length; ++i) {
@@ -201,12 +211,16 @@ export function define<T extends CookieProto>(proto: T, options?: SerializerOpti
 
         if (type.length === 4)
             setLiteral.push(`this.${key}===true?';${key}':''`);
-        else if (type.charCodeAt(0) === 115)
-            setLiteral.push(`typeof this.${key}==='string'?\`;${key}=\${this.${key}}\`:''`);
-        else
-            setLiteral.push(`typeof this.${key}==='number'?\`;${key}=\${this.${key}.toString()}\`:''`);
+        else {
+            keyToCache.push(key);
+
+            if (type.charCodeAt(0) === 115)
+                setLiteral.push(`typeof ${key}==='string'?\`;${key}=\${${key}}\`:''`);
+            else
+                setLiteral.push(`typeof ${key}==='number'?\`;${key}=\${${key}.toString()}\`:''`);
+        }
     }
 
-    props.push(`get(){return ${createLiteral(resultLiteral, setLiteral)}}`);
+    props.push(`get(){${keyToCache.length === 0 ? '' : `const {${keyToCache.join()}}=this;`}return ${createLiteral(resultLiteral, setLiteral)}}`);
     return Function(`'use strict';return class A{${props.join(';')}};`)();
 }
