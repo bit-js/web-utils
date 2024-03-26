@@ -169,9 +169,11 @@ export function define<T extends CookieProto>(proto: T, options?: SerializerOpti
 
     if (!noOptions) resultLiteral.push(serializeOptions(options).join(';'));
 
-    const setLiteral = [];
-    const keyToCache = [];
     const props = Object.keys(proto);
+    const propCount = props.length;
+
+    const setLiteral = new Array<string>(propCount);
+    const keyToCache = [];
 
     // Handle first key
     {
@@ -181,16 +183,16 @@ export function define<T extends CookieProto>(proto: T, options?: SerializerOpti
         if (noOptions) {
             // bool
             if (type.length === 4)
-                setLiteral.push(`this.${key}===true?'${key}':''`);
+                setLiteral[0] = `this.${key}===true?'${key}':''`;
             // string
             else {
                 keyToCache.push(key);
 
                 if (type.charCodeAt(0) === 115)
-                    setLiteral.push(`typeof ${key}==='string'?\`${key}=\${${key}}\`:''`);
+                    setLiteral[0] = `typeof ${key}==='string'?\`${key}=\${${key}}\`:''`;
                 // number
                 else
-                    setLiteral.push(`typeof ${key}==='number'?\`${key}=\${${key}.toString()}\`:''`);
+                    setLiteral[0] = `typeof ${key}==='number'?\`${key}=\${${key}.toString()}\`:''`;
             }
             // Check like other props
         } else if (type.length === 4)
@@ -199,25 +201,25 @@ export function define<T extends CookieProto>(proto: T, options?: SerializerOpti
             keyToCache.push(key);
 
             if (type.charCodeAt(0) === 115)
-                setLiteral.push(`typeof ${key}==='string'?\`;${key}=\${${key}}\`:''`);
+                setLiteral[0] = `typeof ${key}==='string'?\`;${key}=\${${key}}\`:''`;
             else
-                setLiteral.push(`typeof ${key}==='number'?\`;${key}=\${${key}.toString()}\`:''`);
+                setLiteral[0] = `typeof ${key}==='number'?\`;${key}=\${${key}.toString()}\`:''`;
         }
     }
 
-    for (let i = 1, { length } = props; i < length; ++i) {
+    for (let i = 1; i < propCount; ++i) {
         const key = props[i];
         const type = proto[key];
 
         if (type.length === 4)
-            setLiteral.push(`this.${key}===true?';${key}':''`);
+            setLiteral[i] = `this.${key}===true?';${key}':''`;
         else {
             keyToCache.push(key);
 
             if (type.charCodeAt(0) === 115)
-                setLiteral.push(`typeof ${key}==='string'?\`;${key}=\${${key}}\`:''`);
+                setLiteral[i] = `typeof ${key}==='string'?\`;${key}=\${${key}}\`:''`;
             else
-                setLiteral.push(`typeof ${key}==='number'?\`;${key}=\${${key}.toString()}\`:''`);
+                setLiteral[i] = (`typeof ${key}==='number'?\`;${key}=\${${key}.toString()}\`:''`);
         }
     }
 
