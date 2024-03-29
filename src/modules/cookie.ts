@@ -61,7 +61,6 @@ export interface SerializerOptions {
     encode?: (value: string) => string;
 
     domain?: string;
-    expires?: Date;
     httpOnly?: boolean;
     maxAge?: number;
     partitioned?: boolean;
@@ -78,12 +77,10 @@ function serializeOptions(options: SerializerOptions): string[] {
 
     if (typeof options.domain === 'string')
         optionParts.push(`Domain=${options.domain}`);
-    if (options.expires instanceof Date)
-        optionParts.push(`Expires=${options.expires.toUTCString()}`);
     if (options.httpOnly === true)
         optionParts.push('HttpOnly');
     if (typeof options.maxAge === 'number')
-        optionParts.push(`Max-Age=${options.maxAge}`);
+        optionParts.push(`Expires=\${new Date(Date.now()+${options.maxAge * 1000}).toUTCString()}`);
     if (options.partitioned === true)
         optionParts.push('Partitioned');
     if (typeof options.path === 'string')
@@ -117,7 +114,8 @@ export function serialize(cookie: Record<string, string | number | true>): strin
  */
 export function serializer(options: SerializerOptions): typeof serialize {
     const { encode } = options;
-    return Function('f', `return (c)=>{const p=[${JSON.stringify(serializeOptions(options).join())}];for(const k in c){const v=c[k];if(v===true)p.push(k);else p.push(\`\${k}=\${${typeof encode === 'function' ? 'f(v.toString())' : 'v.toString()'}};\`)}return p.join(';');}`)(encode);
+    // eslint-disable-next-line
+    return Function('f', `return (c)=>{const p=[\`${serializeOptions(options).join()}\`];for(const k in c){const v=c[k];if(v===true)p.push(k);else p.push(\`\${k}=\${${typeof encode === 'function' ? 'f(v.toString())' : 'v.toString()'}};\`)}return p.join(';');}`)(encode);
 }
 
 // Cookie prototypes
@@ -219,7 +217,7 @@ export function define<T extends CookieProto>(proto: T, options?: SerializerOpti
             if (type.charCodeAt(0) === 115)
                 setLiteral[i] = `typeof ${key}==='string'?\`;${key}=\${${key}}\`:''`;
             else
-                setLiteral[i] = (`typeof ${key}==='number'?\`;${key}=\${${key}.toString()}\`:''`);
+                setLiteral[i] = `typeof ${key}==='number'?\`;${key}=\${${key}.toString()}\`:''`;
         }
     }
 

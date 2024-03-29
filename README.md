@@ -151,7 +151,6 @@ export interface SerializerOptions {
     encode?: (value: string) => string;
 
     domain?: string;
-    expires?: Date;
     httpOnly?: boolean;
     maxAge?: number;
     partitioned?: boolean;
