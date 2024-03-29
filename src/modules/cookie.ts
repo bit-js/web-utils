@@ -80,7 +80,7 @@ function serializeOptions(options: SerializerOptions): string[] {
     if (options.httpOnly === true)
         optionParts.push('HttpOnly');
     if (typeof options.maxAge === 'number')
-        optionParts.push(`Expires=\${new Date(Date.now()+${options.maxAge * 1000}).toUTCString()}`);
+        optionParts.push(`Max-Age=${options.maxAge.toString()}`);
     if (options.partitioned === true)
         optionParts.push('Partitioned');
     if (typeof options.path === 'string')
@@ -115,7 +115,7 @@ export function serialize(cookie: Record<string, string | number | true>): strin
 export function serializer(options: SerializerOptions): typeof serialize {
     const { encode } = options;
     // eslint-disable-next-line
-    return Function('f', `return (c)=>{const p=[\`${serializeOptions(options).join()}\`];for(const k in c){const v=c[k];if(v===true)p.push(k);else p.push(\`\${k}=\${${typeof encode === 'function' ? 'f(v.toString())' : 'v.toString()'}};\`)}return p.join(';');}`)(encode);
+    return Function('f', `return (c)=>{const p=['${serializeOptions(options).join()}'];for(const k in c){const v=c[k];if(v===true)p.push(k);else p.push(\`\${k}=\${${typeof encode === 'function' ? 'f(v.toString())' : 'v.toString()'}};\`)}return p.join(';');}`)(encode);
 }
 
 // Cookie prototypes
