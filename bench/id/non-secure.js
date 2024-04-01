@@ -9,29 +9,29 @@ import { optimizeNextInvocation } from 'bun:jsc';
 
 for (let i = 0; i < 15; ++i) bench('noop', () => { });
 
-const size = 1e6;
+const cnt = 1e6, size = 12;
 
-group(`Generate ${size} non-secure id of size 32`, () => {
+group(`Generate ${cnt} non-secure id of size ${size}`, () => {
     optimizeNextInvocation(uid);
     bench('UID', () => {
-        for (let i = 0; i < size; ++i) uid(32);
+        for (let i = 0; i < cnt; ++i) uid(size);
     });
 
     optimizeNextInvocation(nanoid);
     bench('Non-secure nanoid', () => {
-        for (let i = 0; i < size; ++i) nanoid(32);
+        for (let i = 0; i < cnt; ++i) nanoid(size);
     });
 
-    const genHexoid = hexoid(32);
+    const genHexoid = hexoid(size);
     optimizeNextInvocation(genHexoid);
     bench('Hexoid', () => {
-        for (let i = 0; i < size; ++i) genHexoid();
+        for (let i = 0; i < cnt; ++i) genHexoid();
     });
 
-    const genID = create.id(32);
+    const genID = create.id(size);
     optimizeNextInvocation(genID);
     bench('ID', () => {
-        for (let i = 0; i < size; ++i) genID();
+        for (let i = 0; i < cnt; ++i) genID();
     });
 })
 

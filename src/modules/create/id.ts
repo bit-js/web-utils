@@ -1,12 +1,20 @@
 /**
  * Create a non-secure ID generator factory that uses `Math.random()`
  */
-function factory(radix: number, mapItemLength: number): (length: number) => () => string {
+export function idFactory(radix: number, mapItemLength: number): (length: number) => () => string {
+    if (radix < 2 || radix > 36) throw new Error(`Radix should be a value between 2 and 36, instead recieved: ${radix}`);
+
     const mapSize = radix ** mapItemLength;
     const randomMap = new Array<string>(mapSize);
     for (let i = 0; i < mapSize; ++i) randomMap[i] = (i + mapSize).toString(radix).substring(1);
 
     return (length) => {
+        const limit = radix ** length;
+        if (Number.isSafeInteger(limit)) {
+            const min = radix ** (length - 1);
+            return Function(`return ()=>(${min}+(Math.random()*${limit - min}>>0)).toString(${radix});`)();
+        }
+
         if (length < mapItemLength) throw new Error(`Output length (${length}) should be larger or equal than ${mapItemLength}`);
 
         // eslint-disable-next-line
@@ -37,4 +45,4 @@ function factory(radix: number, mapItemLength: number): (length: number) => () =
 /**
  * Create a non-secure ID generator that uses `Math.random()`
  */
-export const id = factory(36, 2);
+export const id = idFactory(16, 4);
