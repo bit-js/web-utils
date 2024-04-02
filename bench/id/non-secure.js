@@ -9,7 +9,7 @@ import { optimizeNextInvocation } from 'bun:jsc';
 
 for (let i = 0; i < 15; ++i) bench('noop', () => { });
 
-const cnt = 1e6, size = 12;
+const cnt = 1e6, size = 8 + Math.round(Math.random() * 1296);
 
 group(`Generate ${cnt} non-secure id of size ${size}`, () => {
     optimizeNextInvocation(uid);
@@ -28,7 +28,7 @@ group(`Generate ${cnt} non-secure id of size ${size}`, () => {
         for (let i = 0; i < cnt; ++i) genHexoid();
     });
 
-    const genID = create.id(size);
+    const genID = create.randomID(size);
     optimizeNextInvocation(genID);
     bench('ID', () => {
         for (let i = 0; i < cnt; ++i) genID();

@@ -12,4 +12,6 @@ function replaceTag(tagName: string): string {
 
 // Use best implementations of specific runtimes
 // eslint-disable-next-line
-export const escape: (str: string) => string = globalThis.Bun?.escapeHTML ?? ((str) => str.replace(/[&<>'"]/g, replaceTag));
+export const escape: (str: string) => string = globalThis.Bun?.escapeHTML ?? (
+    (str) => str.replace(/[&<>'"]/g, replaceTag)
+);

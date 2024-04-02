@@ -1,7 +1,7 @@
 /**
  * Create a non-secure ID generator factory that uses `Math.random()`
  */
-export function idFactory(radix: number, mapItemLength: number): (length: number) => () => string {
+export function randomIDFactory(radix: number, mapItemLength: number): (length: number) => () => string {
     if (radix < 2 || radix > 36) throw new Error(`Radix should be a value between 2 and 36, instead recieved: ${radix}`);
 
     const mapSize = radix ** mapItemLength;
@@ -45,4 +45,4 @@ export function idFactory(radix: number, mapItemLength: number): (length: number
 /**
  * Create a non-secure ID generator that uses `Math.random()`
  */
-export const id = idFactory(16, 4);
+export const randomID = randomIDFactory(16, 4);
