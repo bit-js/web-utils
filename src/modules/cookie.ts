@@ -80,7 +80,7 @@ function serializeOptions(options: SerializerOptions): string[] {
     if (options.httpOnly === true)
         optionParts.push('HttpOnly');
     if (typeof options.maxAge === 'number')
-        optionParts.push(`Max-Age=${options.maxAge.toString()}`);
+        optionParts.push(`Max-Age=${options.maxAge}`);
     if (options.partitioned === true)
         optionParts.push('Partitioned');
     if (typeof options.path === 'string')
@@ -103,7 +103,7 @@ export function serialize(cookie: Record<string, string | number | true>): strin
         const value = cookie[key];
 
         if (value === true) parts.push(key);
-        else parts.push(`${key}=${value.toString()}`);
+        else parts.push(`${key}=${value}`);
     }
 
     return parts.join(';');
@@ -115,7 +115,7 @@ export function serialize(cookie: Record<string, string | number | true>): strin
 export function serializer(options: SerializerOptions): typeof serialize {
     const { encode } = options;
     // eslint-disable-next-line
-    return Function('f', `return (c)=>{const p=['${serializeOptions(options).join()}'];for(const k in c){const v=c[k];if(v===true)p.push(k);else p.push(\`\${k}=\${${typeof encode === 'function' ? 'f(v.toString())' : 'v.toString()'}};\`)}return p.join(';');}`)(encode);
+    return Function('f', `return (c)=>{const p=['${serializeOptions(options).join()}'];for(const k in c){const v=c[k];if(v===true)p.push(k);else p.push(\`\${k}=\${${typeof encode === 'function' ? 'f(`${v}`)' : '`${v}`'}};\`)}return p.join(';');}`)(encode);
 }
 
 // Cookie prototypes
@@ -185,23 +185,14 @@ export function define<T extends CookieProto>(proto: T, options?: SerializerOpti
             // string
             else {
                 keyToCache.push(key);
-
-                if (type.charCodeAt(0) === 115)
-                    setLiteral[0] = `typeof ${key}==='string'?\`${key}=\${${key}}\`:''`;
-                // number
-                else
-                    setLiteral[0] = `typeof ${key}==='number'?\`${key}=\${${key}.toString()}\`:''`;
+                setLiteral[0] = `typeof ${key}==='${type.charCodeAt(0) === 115 ? 'string' : 'number'}'?\`${key}=\${${key}}\`:''`;
             }
             // Check like other props
         } else if (type.length === 4)
             setLiteral.push(`this.${key}===true?';${key}':''`);
         else {
             keyToCache.push(key);
-
-            if (type.charCodeAt(0) === 115)
-                setLiteral[0] = `typeof ${key}==='string'?\`;${key}=\${${key}}\`:''`;
-            else
-                setLiteral[0] = `typeof ${key}==='number'?\`;${key}=\${${key}.toString()}\`:''`;
+            setLiteral[0] = `typeof ${key}==='${type.charCodeAt(0) === 115 ? 'string' : 'number'}'?\`;${key}=\${${key}}\`:''`;
         }
     }
 
@@ -213,11 +204,7 @@ export function define<T extends CookieProto>(proto: T, options?: SerializerOpti
             setLiteral[i] = `this.${key}===true?';${key}':''`;
         else {
             keyToCache.push(key);
-
-            if (type.charCodeAt(0) === 115)
-                setLiteral[i] = `typeof ${key}==='string'?\`;${key}=\${${key}}\`:''`;
-            else
-                setLiteral[i] = `typeof ${key}==='number'?\`;${key}=\${${key}.toString()}\`:''`;
+            setLiteral[i] = `typeof ${key}==='${type.charCodeAt(0) === 115 ? 'string' : 'number'}'?\`;${key}=\${${key}}\`:''`;
         }
     }
 
