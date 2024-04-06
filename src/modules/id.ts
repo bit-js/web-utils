@@ -38,6 +38,7 @@ export class UniqueGeneratorFactory {
         this.mapSize = mapSize;
         this.map = map;
 
+        // log[radix](MAX_SAFE_INTEGER)
         this.safeLength = Math.log2(Number.MAX_SAFE_INTEGER) / Math.log2(radix) >>> 0;
 
         this.radix = radix;
