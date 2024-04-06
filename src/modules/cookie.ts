@@ -45,7 +45,7 @@ export function parser(options: ParserOptions): typeof parse {
 }
 
 /**
- * SameSite value
+ * Same site lowercased value
  */
 type SameSiteValue = 'strict' | 'lax' | 'none';
 const sameSiteMap: Record<SameSiteValue, string> = {
@@ -70,7 +70,7 @@ export interface SerializerOptions {
 }
 
 /**
- * @internal Get serialized options
+ * @internal
  */
 function serializeOptions(options: SerializerOptions): string[] {
     const optionParts: string[] = [];
@@ -145,7 +145,7 @@ export type CookieClass<T extends CookieProto> = new () => {
 } & BaseCookie;
 
 /**
- * @internal Create string literal to return
+ * @internal
  */
 function createLiteral(resultLiteral: string[], setLiteral: string[]): string {
     if (resultLiteral.length === 0 && setLiteral.length === 1)

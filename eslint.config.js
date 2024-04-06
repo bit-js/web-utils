@@ -1,32 +1,38 @@
-{
-    "ignorePatterns": [
-        "*.js",
-        "*.d.ts",
-        "*.json",
-        "dist/",
+//@ts-check
+import tsEslint from "typescript-eslint";
+import stylistic from "@stylistic/eslint-plugin";
+import jsdoc from "eslint-plugin-jsdoc";
+
+export default tsEslint.config({
+    ignores: [
+        "**/*.js",
+        "**/*.d.ts",
+        "**/*.json",
+        "dist/**/*",
+        "templates/**/*",
+        "bench/**/*",
         "node_modules/**/*"
     ],
-    "root": true,
-    "parser": "@typescript-eslint/parser",
-    "parserOptions": {
-        "ecmaVersion": "latest",
-        "tsconfigRootDir": ".",
-        "project": [
-            "./tsconfig.json",
-            "./packages/*/tsconfig.json"
-        ]
+}, {
+    files: ["**/*.ts"],
+    plugins: {
+        "@typescript-eslint": tsEslint.plugin,
+        "@stylistic": stylistic,
+        jsdoc
     },
-    "settings": {
-        "import/resolver": {
-            "typescript": true
+    languageOptions: {
+        parser: tsEslint.parser,
+        ecmaVersion: "latest",
+        parserOptions: {
+            tsconfigRootDir: ".",
+            project: [
+                "./tsconfig.json",
+                "./packages/*/tsconfig.json"
+            ]
         }
     },
-    "plugins": [
-        "import",
-        "@stylistic",
-        "@typescript-eslint/eslint-plugin"
-    ],
-    "rules": {
+    rules: {
+        // #region Eslint
         "array-callback-return": "error",
         "constructor-super": "error",
         "for-direction": "error",
@@ -70,6 +76,7 @@
         "require-atomic-updates": "error",
         "use-isnan": "error",
         "accessor-pairs": "error",
+        // "consistent-return": "error", For some reason is not working with TS
         "grouped-accessor-pairs": "error",
         "logical-assignment-operators": "warn",
         "no-array-constructor": "error",
@@ -144,6 +151,8 @@
                 "destructuring": "all"
             }
         ],
+        // #endregion Eslint
+        // #region TSLint
         "@typescript-eslint/adjacent-overload-signatures": "error",
         "@typescript-eslint/await-thenable": "error",
         "@typescript-eslint/ban-ts-comment": "error",
@@ -208,6 +217,8 @@
         "@typescript-eslint/prefer-readonly": "warn",
         "@typescript-eslint/prefer-reduce-type-parameter": "warn",
         "@typescript-eslint/prefer-regexp-exec": "warn",
+        "@typescript-eslint/prefer-return-this-type": "warn",
+        "@typescript-eslint/prefer-string-starts-ends-with": "warn",
         "@typescript-eslint/prefer-ts-expect-error": "warn",
         "@typescript-eslint/promise-function-async": "warn",
         "@typescript-eslint/require-await": "error",
@@ -236,7 +247,6 @@
             {
                 "selector": "variable",
                 "format": [
-                    "PascalCase",
                     "camelCase",
                     "UPPER_CASE"
                 ]
@@ -257,11 +267,23 @@
                 "trailingUnderscore": "allow"
             },
             {
+                "selector": "classProperty",
+                "format": [
+                    "camelCase"
+                ],
+                "leadingUnderscore": "allow",
+                "trailingUnderscore": "allow"
+            },
+            {
+                "selector": "objectLiteralProperty",
+                "format": [
+                    "camelCase",
+                ]
+            },
+            {
                 "selector": "typeProperty",
                 "format": [
                     "camelCase",
-                    "snake_case",
-                    "PascalCase"
                 ]
             },
             {
@@ -273,16 +295,13 @@
             {
                 "selector": "objectLiteralMethod",
                 "format": [
-                    "PascalCase",
                     "camelCase",
-                    "snake_case"
                 ]
             },
             {
                 "selector": "typeMethod",
                 "format": [
                     "camelCase",
-                    "snake_case"
                 ]
             },
             {
@@ -294,7 +313,6 @@
             {
                 "selector": "enumMember",
                 "format": [
-                    "PascalCase",
                     "UPPER_CASE"
                 ]
             },
@@ -414,6 +432,8 @@
                 "ignoreStatic": true
             }
         ],
+        // #endregion TSLint
+        // #region Stylistic
         "@stylistic/arrow-parens": "warn",
         "@stylistic/arrow-spacing": "warn",
         "@stylistic/block-spacing": "warn",
@@ -514,7 +534,7 @@
         "@stylistic/max-len": [
             "error",
             {
-                "code": 300
+                "code": 500
             }
         ],
         "@stylistic/max-statements-per-line": [
@@ -646,47 +666,24 @@
             "warn",
             "after"
         ],
-        "import/default": "error",
-        "import/export": "error",
-        "import/first": "warn",
-        "import/no-cycle": "error",
-        "import/namespace": "error",
-        "import/newline-after-import": "warn",
-        "import/no-absolute-path": "warn",
-        "import/no-deprecated": "error",
-        "import/no-duplicates": "warn",
-        "import/no-empty-named-blocks": "warn",
-        "import/no-mutable-exports": "error",
-        "import/no-named-as-default-member": "warn",
-        "import/no-named-as-default": "warn",
-        "import/no-namespace": "warn",
-        "import/no-self-import": "error",
-        "import/no-useless-path-segments": "warn",
-        "import/no-webpack-loader-syntax": "error",
-        "import/consistent-type-specifier-style": [
-            "warn",
-            "prefer-top-level"
-        ],
-        "import/no-anonymous-default-export": [
-            "error",
-            {
-                "allowObject": true
-            }
-        ],
-        "import/order": [
-            "warn",
-            {
-                "groups": [
-                    "index",
-                    "parent",
-                    "sibling",
-                    "internal",
-                    "external",
-                    "builtin",
-                    "object",
-                    "type"
-                ]
-            }
-        ]
+        "jsdoc/check-access": "error",
+        "jsdoc/check-alignment": "warn",
+        "jsdoc/check-indentation": "error",
+        "jsdoc/check-param-names": "warn",
+        "jsdoc/check-property-names": "warn",
+        "jsdoc/check-tag-names": "warn",
+        "jsdoc/check-values": "error",
+        "jsdoc/empty-tags": "warn",
+        "jsdoc/implements-on-classes": "error",
+        "jsdoc/informative-docs": "error",
+        "jsdoc/multiline-blocks": "warn",
+        "jsdoc/no-bad-blocks": "warn",
+        "jsdoc/no-blank-block-descriptions": "warn",
+        "jsdoc/no-blank-blocks": "warn",
+        "jsdoc/no-defaults": "warn",
+        "jsdoc/no-multi-asterisks": "warn",
+        "jsdoc/no-types": "warn",
+        "jsdoc/require-asterisk-prefix": "warn",
+        "jsdoc/require-hyphen-before-param-description": ["error", "always"]
     }
-}
+});

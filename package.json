@@ -1,28 +1,28 @@
 {
-  "name": "@bit-js/web-utils",
-  "version": "1.0.5",
-  "main": "./lib/index.js",
-  "types": "./lib/index.d.ts",
-  "type": "module",
-  "devDependencies": {
-    "@stylistic/eslint-plugin": "latest",
-    "@types/bun": "latest",
-    "@typescript-eslint/eslint-plugin": "latest",
-    "@typescript-eslint/parser": "latest",
-    "eslint": "latest",
-    "eslint-plugin-import": "latest",
-    "eslint-import-resolver-typescript": "latest",
-    "mitata": "latest",
-    "typescript": "latest"
-  },
-  "dependencies": {},
-  "exports": {
-    ".": "./lib/index.js",
-    "./*": "./lib/*.js"
-  },
-  "scripts": {
-    "build-test": "bun build.ts && bun test",
-    "jitrun": "BUN_JSC_jitPolicyScale=0.0 BUN_JSC_thresholdForOptimizeSoon=0.0 BUN_JSC_thresholdForJITSoon=0.0 bun run",
-    "lint": "bun x eslint ./src/**/*.ts"
-  }
+    "name": "@bit-js/web-utils",
+    "version": "1.0.5",
+    "author": "aquapi",
+    "license": "MIT",
+    "keywords": [],
+    "type": "module",
+    "main": "./lib/index.js",
+    "types": "./lib/index.d.ts",
+    "exports": {
+        ".": "./lib/index.js",
+        "./*": "./lib/*.js"
+    },
+    "scripts": {
+        "build:test": "bun build.ts && bun test",
+        "lint": "eslint ./src",
+        "lint:fix": "eslint ./src --fix"
+    },
+    "devDependencies": {
+        "@stylistic/eslint-plugin": "latest",
+        "eslint": "latest",
+        "typescript-eslint": "latest",
+        "eslint-plugin-jsdoc": "latest",
+        "@types/bun": "latest",
+        "mitata": "latest",
+        "typescript": "latest"
+    }
 }
