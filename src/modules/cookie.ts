@@ -120,7 +120,7 @@ export function serializer(options: SerializerOptions): typeof serialize {
 
 // Cookie prototypes
 export type CookieProtoTypes = 'string' | 'number' | 'bool';
-export type CookieProtoTypesMap = {
+export interface CookieProtoTypesMap {
     string: string,
     number: number,
     bool: boolean

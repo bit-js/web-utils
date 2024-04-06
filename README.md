@@ -199,17 +199,17 @@ html.escape(str);
 
 This uses `Bun.escapeHtml` if you are using Bun.
 
-## Generators
-Generator utilities.
+## ID generators
+ID generator utilities.
 ```ts
-import { create } from '@bit-js/web-utils';
+import { id } from '@bit-js/web-utils';
 ```
 
 ### Non-secure ID
 A fast non-secure ID generator using `Math.random()`.
 ```ts
 // Specify string length
-const f = create.id(32);
+const f = id.unique.size(32);
 
 // Generate a random ID of length 32
 f();

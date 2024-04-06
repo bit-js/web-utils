@@ -2,7 +2,7 @@ import { group, run, bench } from 'mitata';
 
 import { uid } from 'uid';
 import hexoid from 'hexoid';
-import { create } from '../..';
+import { id } from '../..';
 import { nanoid } from 'nanoid/non-secure';
 
 import { optimizeNextInvocation } from 'bun:jsc';
@@ -28,7 +28,7 @@ group(`Generate ${cnt} non-secure id of size ${size}`, () => {
         for (let i = 0; i < cnt; ++i) genHexoid();
     });
 
-    const genID = create.randomID(size);
+    const genID = id.unique.size(size);
     optimizeNextInvocation(genID);
     bench('ID', () => {
         for (let i = 0; i < cnt; ++i) genID();
