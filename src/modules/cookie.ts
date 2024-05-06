@@ -8,13 +8,13 @@ export interface ParserOptions {
 /**
  * Parse a cookie string
  */
-export function parse(cookie: string): Record<string, string> {
+export function parse(cookie: string): Map<string, string> {
     const pairs = cookie.split(';');
-    const result: Record<string, string> = {};
+    const result = new Map<string, string>();
 
     for (let i = 0, { length } = pairs; i < length; ++i) {
         const pair = pairs[i].split('=');
-        result[pair[0].trim()] = pair.length === 1 ? '' : pair[1].trim();
+        result.set(pair[0].trim(), pair.length === 1 ? '' : pair[1].trim());
     }
 
     return result;
@@ -33,11 +33,11 @@ export function parser(options: ParserOptions): typeof parse {
     // Cookie with value decode
     return (cookie) => {
         const pairs = cookie.split(';');
-        const result: Record<string, string> = {};
+        const result = new Map<string, string>();
 
         for (let i = 0, { length } = pairs; i < length; ++i) {
             const pair = pairs[i].split('=');
-            result[pair[0].trim()] = pair.length === 1 ? defaultVal : decode(pair[1].trim());
+            result.set(pair[0].trim(), pair.length === 1 ? defaultVal : decode(pair[1].trim()));
         }
 
         return result;
@@ -101,9 +101,7 @@ export function serialize(cookie: Record<string, string | number | true>): strin
 
     for (const key in cookie) {
         const value = cookie[key];
-
-        if (value === true) parts.push(key);
-        else parts.push(`${key}=${value}`);
+        parts.push(value === true ? key : `${key}=${value}`);
     }
 
     return parts.join(';');
@@ -121,10 +119,10 @@ export function serializer(options: SerializerOptions): typeof serialize {
 // Cookie prototypes
 export type CookieProtoTypes = 'string' | 'number' | 'bool';
 export interface CookieProtoTypesMap {
-    string: string,
-    number: number,
-    bool: boolean
-};
+    string: string;
+    number: number;
+    bool: boolean;
+}
 export type CookieProto = Record<string, CookieProtoTypes>;
 
 /**
@@ -209,5 +207,5 @@ export function define<T extends CookieProto>(proto: T, options?: SerializerOpti
     }
 
     props.push(`get(){${keyToCache.length === 0 ? '' : `const {${keyToCache.join()}}=this;`}return ${createLiteral(resultLiteral, setLiteral)}}`);
-    return Function(`'use strict';return class A{${props.join(';')}};`)();
+    return Function(`return class A{${props.join(';')}};`)();
 }
