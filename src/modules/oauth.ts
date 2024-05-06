@@ -23,40 +23,38 @@ export interface TokenErrorResponse {
 export type TokenResult = TokenErrorResponse | TokenResponse;
 
 const genericError: TokenErrorResponse = { error: 'Authentication failed' };
-
 function yieldError(): TokenErrorResponse {
     return genericError;
 }
-
 function toTokenResult(res: Response): Promise<TokenResult> | TokenResult {
     return res.ok ? res.json().catch(yieldError) : genericError;
 }
 
 // Options
-export interface TokenOptions {
-    credentials?: string;
-    authenticateWith?: 'http_basic_auth' | 'request_body';
+export class ClientOptions {
+    public readonly id!: string;
+    public readonly authorizeEndpoint!: string;
+    public readonly tokenEndpoint!: string;
+    public readonly redirectURI?: string;
+    public readonly authenticateWith?: 'http_basic_auth' | 'request_body';
 }
 
 // Client
 const textEncoder = new TextEncoder();
 
-export class Client {
-    public readonly id: string;
-    public readonly authorizeEndpoint: string;
-    public readonly tokenEndpoint: string;
-    public readonly redirectURI: string | null;
-
-    public constructor(
-        id: string,
-        authorizeEndpoint: string,
-        tokenEndpoint: string,
-        redirectURI?: string
-    ) {
-        this.id = id;
-        this.authorizeEndpoint = authorizeEndpoint;
-        this.tokenEndpoint = tokenEndpoint;
-        this.redirectURI = redirectURI ?? null;
+export class Client extends ClientOptions {
+    public constructor(options: ClientOptions) {
+        super();
+        // @ts-expect-error Prop assign
+        this.id = options.id;
+        // @ts-expect-error Prop assign
+        this.authorizeEndpoint = options.authorizeEndpoint;
+        // @ts-expect-error Prop assign
+        this.tokenEndpoint = options.tokenEndpoint;
+        // @ts-expect-error Prop assign
+        this.redirectURI = options.redirectURI;
+        // @ts-expect-error Prop assign
+        this.authenticateWith = options.authenticateWith;
     }
 
     public async createAuthorizationURL(options?: {
@@ -71,7 +69,7 @@ export class Client {
         searchParams.set('response_type', 'code');
         searchParams.set('client_id', this.id);
 
-        if (this.redirectURI !== null)
+        if (this.redirectURI !== undefined)
             searchParams.set('redirect_uri', this.redirectURI);
 
         if (options !== undefined) {
@@ -97,25 +95,31 @@ export class Client {
 
     public async validateAuthorizationCode(
         authorizationCode: string,
-        options?: TokenOptions & { codeVerifier?: string }
+        options?: {
+            credentials?: string,
+            codeVerifier?: string
+        }
     ): Promise<TokenResult> {
         const body = new URLSearchParams();
         body.set('code', authorizationCode);
         body.set('client_id', this.id);
         body.set('grant_type', 'authorization_code');
 
-        if (this.redirectURI !== null)
+        if (this.redirectURI !== undefined)
             body.set('redirect_uri', this.redirectURI);
 
         if (options?.codeVerifier !== undefined)
             body.set('code_verifier', options.codeVerifier);
 
-        return this.sendTokenRequest(body, options);
+        return this.sendTokenRequest(body, options?.credentials);
     }
 
     public async refreshAccessToken(
         refreshToken: string,
-        options?: TokenOptions & { scopes?: string[] }
+        options?: {
+            credentials?: string,
+            scopes?: string[]
+        }
     ): Promise<TokenResult> {
         const body = new URLSearchParams();
         body.set('refresh_token', refreshToken);
@@ -126,13 +130,13 @@ export class Client {
         if (scopes.length !== 0)
             body.set('scope', scopes.join(' '));
 
-        return this.sendTokenRequest(body, options);
+        return this.sendTokenRequest(body, options?.credentials);
     }
 
     // eslint-disable-next-line
     public sendTokenRequest(
         body: URLSearchParams,
-        options?: TokenOptions
+        credentials?: string
     ): Promise<TokenResult> {
         const headers = {
             // eslint-disable-next-line
@@ -141,15 +145,15 @@ export class Client {
             'Accept': 'application/json'
         };
 
-        if (options?.credentials !== undefined) {
-            const { authenticateWith } = options;
+        if (credentials !== undefined) {
+            const { authenticateWith } = this;
 
             if (authenticateWith === undefined || authenticateWith === 'http_basic_auth')
                 // @ts-expect-error Add more props to the header
                 // eslint-disable-next-line
-                headers.Authorization = 'Basic ' + btoa(`${this.id}:${options.credentials}`);
+                headers.Authorization = 'Basic ' + btoa(`${this.id}:${credentials}`);
 
-            else body.set('client_secret', options.credentials);
+            else body.set('client_secret', credentials);
         }
 
         return fetch(this.tokenEndpoint, { method: 'POST', headers, body }).then(toTokenResult);
