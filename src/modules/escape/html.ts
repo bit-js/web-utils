@@ -21,12 +21,12 @@ export const tagsMap = [
 /**
  * Replace unescaped tags with the corresponding escaped characters
  */
-export function replaceTag(tagName: string): string {
+function replaceTag(tagName: string): string {
     return tagsMap[tagName.charCodeAt(0)];
 }
 
-// Use best implementations of specific runtimes
+// Use the fastest implementation of specific runtimes
 // eslint-disable-next-line
-export const escape: (str: string) => string = globalThis.Bun?.escapeHTML ?? (
-    (str) => str.replace(/[&<>'"]/g, replaceTag)
+export default globalThis.Bun?.escapeHTML ?? (
+    (str: string): string => str.replace(/[&<>'"]/g, replaceTag)
 );
