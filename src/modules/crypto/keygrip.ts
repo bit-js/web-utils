@@ -1,4 +1,5 @@
-import { escapeBase64Char, text } from '../encode';
+import { textEncoder } from '../../constants';
+import { escapeBase64Char } from '../encode';
 import { algorithm, key, timingSafeEqual } from './hmac';
 
 export class KeyGrip {
@@ -22,7 +23,7 @@ export class KeyGrip {
 
     public async verify(data: BufferSource, digest: BufferSource): Promise<boolean> {
         for (let i = 0, len = this.keyCount; i < len; ++i) {
-            if (await timingSafeEqual(digest, text(await this.signKey(data, i))))
+            if (await timingSafeEqual(digest, textEncoder.encode(await this.signKey(data, i))))
                 return true;
         }
 
@@ -31,7 +32,7 @@ export class KeyGrip {
 
     public async index(data: BufferSource, digest: BufferSource): Promise<number> {
         for (let i = 0, len = this.keyCount; i < len; ++i) {
-            if (await timingSafeEqual(digest, text(await this.signKey(data, i))))
+            if (await timingSafeEqual(digest, textEncoder.encode(await this.signKey(data, i))))
                 return i;
         }
 
@@ -40,18 +41,16 @@ export class KeyGrip {
 
     // eslint-disable-next-line
     private async signKey(data: BufferSource, keyIdx: number) {
-        return this.decoder.decode(
-            await crypto.subtle.sign(this.algorithm, this.keys[keyIdx], data)
-        ).replace(/[+/=]/g, escapeBase64Char);
+        return this.decoder.decode(await crypto.subtle.sign(this.algorithm, this.keys[keyIdx], data)).replace(/[+/=]/g, escapeBase64Char);
     }
 }
 
-export async function create(secrets: string[], keyAlgorithm?: string, encoding?: string) {
+export async function init(secrets: string[], keyAlgorithm?: string, encoding?: string) {
     const algo = algorithm(keyAlgorithm ?? 'sha1');
 
     const { length } = secrets;
     const keys = new Array<CryptoKey>(length);
-    for (let i = 0; i < length; ++i) keys[i] = await key(text(secrets[i]), algo);
+    for (let i = 0; i < length; ++i) keys[i] = await key(textEncoder.encode(secrets[i]), algo);
 
     return new KeyGrip(keys, algo, encoding ?? 'base64');
 }
