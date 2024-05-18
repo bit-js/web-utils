@@ -158,9 +158,9 @@ export class Client extends ClientOptions {
 // Utils
 const store = new Uint8Array(32);
 
-export function createState(): string {
+export function generateState(): string {
     crypto.getRandomValues(store);
     return bufferToBase64URL(store);
 }
 
-export const createCodeVerifier = createState;
+export const generateCodeVerifier = generateState;
