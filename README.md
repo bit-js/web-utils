@@ -100,34 +100,52 @@ export interface ControlOptions {
 }
 ```
 
-## HTML
-HTML parsing utilities.
+## Cookie 
+Cookie parser and serializer.
 ```ts
-import { html } from '@bit-js/web-utils';
+import { cookie } from '@bit-js/web-utils';
 ```
 
-### Escaping
+### Parser
+This parses the cookie string to a `Record<string, string>`.
+```ts
+cookie.parse(str);
+```
+
+### Serializer
+Set cookie values using cookie pairs.
+```ts
+// Create a cookie pair
+const pair = cookie.pair('id', 1);
+
+// Set other properties
+pair.maxAge = 1000 * 60 * 60 * 24;
+
+// Attach the value to a header object
+pair.attach(headers);
+```
+
+Or attach an already existed value to the header object:
+```ts
+cookie.attach(headers, str);
+```
+
+## Escaping string
+String escaping utilities.
+```ts
+import { escape } from '@bit-js/web-utils';
+```
+
+### HTML
 Escape HTML entities.
 ```ts
-html.escape(str);
+escape.html(str);
 ```
 
-This uses `Bun.escapeHtml` if you are using Bun.
+This uses `Bun.escapeHTML` if you are using Bun.
 
-## ID generators
-ID generator utilities.
+### Base64 URL
+Escape `base64url` entities.
 ```ts
-import { id } from '@bit-js/web-utils';
+escape.base64url(str);
 ```
-
-### Non-secure ID
-A fast non-secure ID generator using `Math.random()`.
-```ts
-// Specify string length
-const f = id.unique.size(32);
-
-// Generate a random ID of length 32
-f();
-```
-
-This is an optimized version of [`hexoid`](//github.com/lukeed/hexoid) by [@lukeed](//github.com/lukeed).
