@@ -1,4 +1,4 @@
-import { bufferToBase64URL } from './utils';
+import { bufferToBase64URL } from '../utils';
 
 // Token response
 export interface TokenResponse {
@@ -92,7 +92,8 @@ export class Client extends ClientOptions {
         return authorizationUrl;
     }
 
-    public async validateAuthorizationCode(
+    // eslint-disable-next-line
+    public validateAuthorizationCode(
         authorizationCode: string,
         credentials?: string
     ): Promise<TokenResult> {
@@ -110,7 +111,8 @@ export class Client extends ClientOptions {
         return this.sendTokenRequest(body, credentials);
     }
 
-    public async refreshAccessToken(
+    // eslint-disable-next-line
+    public refreshAccessToken(
         refreshToken: string,
         credentials?: string
     ): Promise<TokenResult> {
