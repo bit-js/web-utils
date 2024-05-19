@@ -70,59 +70,62 @@ export function parseValue(value: SourceValue): string {
  * Parse CSP options to `Content-Security-Policy` header values
  */
 export function parse(options?: Options): string {
-    if (typeof options === 'undefined') return "default-src 'self'";
+    if (options === undefined) return "default-src 'self'";
 
     // Parts of the header
     const parts = [];
 
-    if (typeof options.baseURI !== 'undefined')
+    if (options.baseURI !== undefined)
         parts.push(`base-uri ${parseValue(options.baseURI)}`);
-    if (typeof options.frameAncestors !== 'undefined')
+    if (options.frameAncestors !== undefined)
         parts.push(`frame-ancestors ${parseValue(options.frameAncestors)}`);
 
-    if (typeof options.reportTo === 'string')
+    if (options.reportTo !== undefined)
         parts.push(`report-to ${options.reportTo}`);
 
-    if (typeof options.sandbox !== 'undefined' && options.sandbox !== false)
-        parts.push(options.sandbox === true ? 'sandbox' : `sandbox '${options.sandbox}'`);
+    {
+        const { sandbox } = options;
+        if (sandbox !== undefined && sandbox !== false)
+            parts.push(sandbox === true ? 'sandbox' : `sandbox '${sandbox}'`);
+    }
 
     if (options.upgradeInsecureRequests === true)
         parts.push('upgrade-insecure-requests');
 
     const { sources } = options;
-    if (typeof sources !== 'undefined') {
-        if (typeof sources.default !== 'undefined')
+    if (sources !== undefined) {
+        if (sources.default !== undefined)
             parts.push(`default-src ${parseValue(sources.default)}`);
 
-        if (typeof sources.child !== 'undefined')
+        if (sources.child !== undefined)
             parts.push(`child-src ${parseValue(sources.child)}`);
-        if (typeof sources.connect !== 'undefined')
+        if (sources.connect !== undefined)
             parts.push(`connect-src ${parseValue(sources.connect)}`);
-        if (typeof sources.font !== 'undefined')
+        if (sources.font !== undefined)
             parts.push(`font-src ${parseValue(sources.font)}`);
-        if (typeof sources.image !== 'undefined')
+        if (sources.image !== undefined)
             parts.push(`img-src ${parseValue(sources.image)}`);
-        if (typeof sources.media !== 'undefined')
+        if (sources.media !== undefined)
             parts.push(`media-src ${parseValue(sources.media)}`);
-        if (typeof sources.object !== 'undefined')
+        if (sources.object !== undefined)
             parts.push(`object-src ${parseValue(sources.object)}`);
-        if (typeof sources.manifest !== 'undefined')
+        if (sources.manifest !== undefined)
             parts.push(`manifest-src ${parseValue(sources.manifest)}`);
-        if (typeof sources.worker !== 'undefined')
+        if (sources.worker !== undefined)
             parts.push(`worker-src ${parseValue(sources.worker)}`);
 
-        if (typeof sources.script !== 'undefined')
+        if (sources.script !== undefined)
             parts.push(`script-src ${parseValue(sources.script)}`);
-        if (typeof sources.scriptAttribute !== 'undefined')
+        if (sources.scriptAttribute !== undefined)
             parts.push(`script-src-attr ${parseValue(sources.scriptAttribute)}`);
-        if (typeof sources.scriptElement !== 'undefined')
+        if (sources.scriptElement !== undefined)
             parts.push(`script-src-elem ${parseValue(sources.scriptElement)}`);
 
-        if (typeof sources.style !== 'undefined')
+        if (sources.style !== undefined)
             parts.push(`style-src ${parseValue(sources.style)}`);
-        if (typeof sources.styleAttribute !== 'undefined')
+        if (sources.styleAttribute !== undefined)
             parts.push(`style-src-attr ${parseValue(sources.styleAttribute)}`);
-        if (typeof sources.styleElement !== 'undefined')
+        if (sources.styleElement !== undefined)
             parts.push(`style-src-elem ${parseValue(sources.styleElement)}`);
     }
 

@@ -100,6 +100,21 @@ export interface ControlOptions {
 }
 ```
 
+## Server timing
+Set server timing metrics.
+```ts
+import { serverTiming } from '@bit-js/web-utils';
+
+// Start the timer
+const resolveTime = serverTiming.metric('resolveTime');
+
+// Do some tasks
+resolve();
+
+// Calculate the result and modify the header object
+resolveTime.attach(headers);
+```
+
 ## Cookie 
 Cookie parser and serializer.
 ```ts
