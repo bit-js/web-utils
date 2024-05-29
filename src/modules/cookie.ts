@@ -23,7 +23,7 @@ export class Pair {
         return `${this.key}=${this.value}${typeof this.domain === 'string' ? `; Domain=${this.domain}` : ''}${typeof this.expires === 'string' ? `; Expires=${this.expires}` : ''}${this.httpOnly === true ? '; HttpOnly' : ''}${typeof this.maxAge === 'number' ? `; Max-Age=${this.maxAge}` : ''}${this.partitioned === true ? '; Partitioned' : ''}${typeof this.path === 'string' ? `; Path=${this.path}` : ''}${this.secure === true ? '; Secure' : ''}${typeof this.sameSite === 'string' ? `; SameSite=${this.sameSite}` : ''}`;
     }
 
-    public attach(headers: Record<string, string | string[]>): void {
+    public attach(headers: Record<string, string>): void {
         attach(headers, this.get());
     }
 }
@@ -38,16 +38,9 @@ export function pair(key: string, value: string | number | boolean | null | unde
 /**
  * Set the cookie value to a header object
  */
-export function attach(headers: Record<string, string | string[]>, cookie: string): void {
-    const val = headers['Set-Cookie'];
-
+export function attach(headers: Record<string, string>, cookie: string): void {
     // eslint-disable-next-line
-    if (val === undefined)
-        headers['Set-Cookie'] = cookie;
-    else if (typeof val === 'string')
-        headers['Set-Cookie'] = [val, cookie];
-    else
-        val.push(cookie);
+    headers['Set-Cookie'] = headers['Set-Cookie'] === undefined ? cookie : `${headers['Set-Cookie']}, ${cookie}`;
 }
 
 /**
