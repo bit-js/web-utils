@@ -124,7 +124,7 @@ const result = startTime();
 // Do some tasks
 resolve();
 
-// Calculate the result and modify the header record
+// Calculate the result and modify the header pairs
 result.attach(headers);
 
 // Or append to a Headers object
@@ -168,28 +168,3 @@ Or attach an already existed value to the header object:
 cookie.attach(headers, str);
 ```
 
-## Escaping string
-
-String escaping utilities.
-
-```ts
-import { escape } from "@bit-js/web-utils";
-```
-
-### HTML
-
-Escape HTML entities.
-
-```ts
-escape.html(str);
-```
-
-This uses `Bun.escapeHTML` if you are using Bun.
-
-### Base64 URL
-
-Escape `base64url` entities.
-
-```ts
-escape.base64url(str);
-```
