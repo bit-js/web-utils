@@ -71,5 +71,5 @@ export function control(options?: ControlOptions): string {
     if (options.onlyIfCached === true)
         parts.push('only-if-cached');
 
-    return parts.join(',');
+    return parts.join(', ');
 }

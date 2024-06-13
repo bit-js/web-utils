@@ -124,7 +124,7 @@ const result = startTime();
 // Do some tasks
 resolve();
 
-// Calculate the result and modify the header pairs
+// Calculate the result and modify the header pairs (string[][])
 result.attach(headers);
 
 // Or append to a Headers object
@@ -158,7 +158,7 @@ const pair = cookie.pair("id", 1);
 // Set other properties
 pair.maxAge = 1000 * 60 * 60 * 24;
 
-// Attach the value to a header object
+// Attach the value to a header pairs (string[][])
 pair.attach(headers);
 ```
 
@@ -168,3 +168,37 @@ Or attach an already existed value to the header object:
 cookie.attach(headers, str);
 ```
 
+## Other utilities
+
+### Escape HTML
+
+Escape special HTML characters.
+
+```ts
+import { escapeHTML } from "@bit-js/web-utils";
+
+escapeHTML("<p>Hello</p>");
+```
+
+### Escape Base64URL
+
+Convert `base64` to `base64url`.
+
+```ts
+import { escapeBase64URL } from "@bit-js/web-utils";
+
+escapeBase64URL("abase64string");
+```
+
+### Render safe HTML
+
+Render safe HTML with tagged temlate strings.
+
+```ts
+import { html } from "@bit-js/web-utils";
+
+html`<p>${content}</p>`; // content is automatically escaped
+html`<p>!${content}</p>`; // Disable escaping by prefixing !
+```
+
+The `content` can be a `string`, `number`, `boolean`, `null`, `undefined` or an array of those types.

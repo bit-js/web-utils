@@ -1,8 +1,8 @@
-export type Value = string | number | boolean | null | undefined;
+import type { Value } from '../utils';
 
 export class Pair {
     public readonly key: string;
-    public readonly value: Value;
+    public value: Value;
 
     public domain?: string;
     public expires?: string;

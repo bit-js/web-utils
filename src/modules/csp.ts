@@ -42,8 +42,9 @@ export interface Options {
     sources?: SourceDirectives;
 }
 
-export function hash(value: string, algorithm?: string): string {
-    return typeof algorithm === 'string' ? `'${algorithm}-${value}'` : `'nonce-${value}'`;
+export function hash<Value extends string, Algorithm extends string = 'nonce'>(value: string, algorithm?: string): `'${Algorithm}-${Value}'` {
+    // @ts-expect-error Stricter return type
+    return `'${algorithm ?? 'nonce'}-${value}'`;
 }
 
 // Special source values
@@ -83,11 +84,8 @@ export function parse(options?: Options): string {
     if (options.reportTo !== undefined)
         parts.push(`report-to ${options.reportTo}`);
 
-    {
-        const { sandbox } = options;
-        if (sandbox !== undefined && sandbox !== false)
-            parts.push(sandbox === true ? 'sandbox' : `sandbox '${sandbox}'`);
-    }
+    if (options.sandbox !== undefined && options.sandbox !== false)
+        parts.push(options.sandbox === true ? 'sandbox' : `sandbox '${options.sandbox}'`);
 
     if (options.upgradeInsecureRequests === true)
         parts.push('upgrade-insecure-requests');
@@ -129,5 +127,5 @@ export function parse(options?: Options): string {
             parts.push(`style-src-elem ${parseValue(sources.styleElement)}`);
     }
 
-    return parts.join(';');
+    return parts.join('; ');
 }

@@ -7,12 +7,8 @@ export class Metric {
         this.value = value;
     }
 
-    public attach(headers: Record<string, string>): void {
-        // eslint-disable-next-line
-        if (headers['Server-Timing'] === undefined)
-            headers['Server-Timing'] = this.value + (performance.now() - this.startTime);
-        else
-            headers['Server-Timing'] += `, ${this.value}${performance.now() - this.startTime}`;
+    public attach(headers: string[][]): void {
+        headers.push(['Server-Timing', this.value + (performance.now() - this.startTime)]);
     }
 
     public append(headers: Headers): void {
