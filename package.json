@@ -22,10 +22,8 @@
     "typescript-eslint": "latest",
     "eslint-plugin-jsdoc": "latest",
     "@types/bun": "latest",
+    "tsx": "latest",
     "mitata": "latest",
     "typescript": "latest"
-  },
-  "dependencies": {
-    "tsx": "^4.15.1"
   }
 }
