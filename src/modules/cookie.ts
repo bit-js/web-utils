@@ -23,7 +23,7 @@ export class Pair {
         return `${this.key}=${this.value}${typeof this.domain === 'string' ? `; Domain=${this.domain}` : ''}${typeof this.expires === 'string' ? `; Expires=${this.expires}` : ''}${this.httpOnly === true ? '; HttpOnly' : ''}${typeof this.maxAge === 'number' ? `; Max-Age=${this.maxAge}` : ''}${this.partitioned === true ? '; Partitioned' : ''}${typeof this.path === 'string' ? `; Path=${this.path}` : ''}${this.secure === true ? '; Secure' : ''}${typeof this.sameSite === 'string' ? `; SameSite=${this.sameSite}` : ''}`;
     }
 
-    public attach(headers: string[][]): void {
+    public attach(headers: (readonly [string, string])[]): void {
         headers.push(['Set-Cookie', this.get()]);
     }
 

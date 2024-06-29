@@ -7,7 +7,7 @@ export class Metric {
         this.value = value;
     }
 
-    public attach(headers: string[][]): void {
+    public attach(headers: (readonly [string, string])[]): void {
         headers.push(['Server-Timing', this.value + (performance.now() - this.startTime)]);
     }
 
