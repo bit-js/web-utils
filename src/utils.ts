@@ -12,12 +12,8 @@ base64map[43] = '-';
 base64map[47] = '_';
 base64map[61] = '';
 
-function escapeBase64Char(char: string): string {
-    return base64map[char.charCodeAt(0)];
-}
-
 export function escapeBase64URL(str: string): string {
-    return str.replace(/[+/=]/gu, escapeBase64Char);
+    return str.replace(/[+/=]/g, (char) => base64map[char.charCodeAt(0)]);
 }
 
 const tagsMap: string[] = [];
@@ -25,17 +21,9 @@ tagsMap[34] = '&quot;';
 tagsMap[38] = '&amp;';
 tagsMap[39] = '&#39';
 tagsMap[60] = '&lt;';
-tagsMap[62] = '&gt;';
-
-/**
- * Replace unescaped tags with the corresponding escaped characters
- */
-function replaceTag(tagName: string): string {
-    return tagsMap[tagName.charCodeAt(0)];
-}
 
 export const escapeHTML = globalThis.Bun?.escapeHTML ?? (
-    (str: string): string => str.replace(/[&<>'"]/gu, replaceTag)
+    (str: string): string => str.replace(/[&<'"]/g, (tag) => tagsMap[tag.charCodeAt(0)])
 );
 
 /**
