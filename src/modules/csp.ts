@@ -42,7 +42,7 @@ export interface Options {
     sources?: SourceDirectives;
 }
 
-export function hash<Value extends string, Algorithm extends string = 'nonce'>(value: string, algorithm?: string): `'${Algorithm}-${Value}'` {
+export function hash<Value extends string, Algorithm extends string = 'nonce'>(value: Value, algorithm?: Algorithm): `'${Algorithm}-${Value}'` {
     // @ts-expect-error Stricter return type
     return `'${algorithm ?? 'nonce'}-${value}'`;
 }

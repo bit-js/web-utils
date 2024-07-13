@@ -38,8 +38,8 @@ export function html({ raw }: TemplateStringsArray, ...args: (Value | Value[])[]
         const prevString = raw[i];
 
         result += prevString.charCodeAt(prevString.length - 1) === 33
-            ? `${prevString.substring(0, prevString.length - 1)}${val === undefined || val === null ? '' : typeof val === 'string' ? val : Array.isArray(val) ? val.join('') : val}`
-            : `${prevString}${val === undefined || val === null ? '' : typeof val === 'string' ? escapeHTML(val) : Array.isArray(val) ? escapeHTML(val.join('')) : val}`;
+            ? `${prevString.substring(0, prevString.length - 1)}${typeof val === 'undefined' || val === null ? '' : typeof val === 'string' ? val : Array.isArray(val) ? val.join('') : val}`
+            : `${prevString}${typeof val === 'undefined' || val === null ? '' : typeof val === 'string' ? escapeHTML(val) : Array.isArray(val) ? escapeHTML(val.join('')) : val}`;
     }
 
     return result + raw[length];

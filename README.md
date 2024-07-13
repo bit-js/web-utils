@@ -131,43 +131,6 @@ result.attach(headers);
 result.append(headers);
 ```
 
-## Cookie
-
-Cookie parser and serializer.
-
-```ts
-import { cookie } from "@bit-js/web-utils";
-```
-
-### Parser
-
-This parses the cookie string to a `Record<string, string>`.
-
-```ts
-cookie.parse(str);
-```
-
-### Serializer
-
-Set cookie values using cookie pairs.
-
-```ts
-// Create a cookie pair
-const pair = cookie.pair("id", 1);
-
-// Set other properties
-pair.maxAge = 1000 * 60 * 60 * 24;
-
-// Attach the value to a header pairs (string[][])
-pair.attach(headers);
-```
-
-Or attach an already existed value to the header object:
-
-```ts
-cookie.attach(headers, str);
-```
-
 ## Other utilities
 
 ### Escape HTML
